@@ -18,31 +18,31 @@ import org.springframework.http.HttpStatus;
  */
 @ControllerAdvice
 public class ControllerExceptionHandler {
-	/**
-	 * logger.
-	 */
-	private static Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
+    /**
+     * logger.
+     */
+    private static Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
-	/**
-	 * DefaultErrorHandler for overall exception handler.
-	 *
-	 * @param request   HttpServletRequest
-	 * @param response  HttpServletResponse
-	 * @param exception Exception
-	 * @return null
-	 */
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(value = Exception.class)
-	public String defaultErrorHandler(HttpServletRequest request, HttpServletResponse response,
-			Exception exception) {
-		try {
-			log.warn("Unexpected error occurred. " + exception.getMessage());
-			String result = "Error Happend, Please Contact with Administrator";
-			response.getWriter().write(result);
-			return null;
-		} catch (Exception e) {
-			log.error("Error handling function is failed. " + e.getMessage());
-			return null;
-		}
-	}
+    /**
+     * DefaultErrorHandler for overall exception handler.
+     *
+     * @param request   HttpServletRequest
+     * @param response  HttpServletResponse
+     * @param exception Exception
+     * @return null
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = Exception.class)
+    public String defaultErrorHandler(HttpServletRequest request, HttpServletResponse response,
+            Exception exception) {
+        try {
+            log.warn("Unexpected error occurred. " + exception.getMessage());
+            String result = "Error Happend, Please Contact with Administrator";
+            response.getWriter().write(result);
+            return null;
+        } catch (Exception e) {
+            log.error("Error handling function is failed. " + e.getMessage());
+            return null;
+        }
+    }
 }
