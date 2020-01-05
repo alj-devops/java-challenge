@@ -1,261 +1,336 @@
 package jp.co.axa.apidemo.services;
 
+import org.junit.Before;
+
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import jp.co.axa.apidemo.entities.Employee;
 
 /**
- * Test for the EmployeeServiceImplTest
+ * Test for the employeeService. For the parameter check it should be done in
+ * Controller Test.
+ *
  * @author li.han
  *
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
 public class EmployeeServiceImplTest {
+    /**
+     * EmployeeService for test.
+     */
+    @Autowired
+    private EmployeeService employeeService;
 
-	@Autowired
-	EmployeeService employeeService;
+    /**
+     * employee1 with Department, Name, Salary.
+     */
+    private Employee employee1 = new Employee();
 
-	private Employee employee1 = new Employee();
-	private Employee employee2 = new Employee();
-	private Employee employee3 = new Employee();
-	private Employee employee4 = new Employee();
+    /**
+     * employee2 with Department, Name, Salary, different id.
+     */
+    private Employee employee2 = new Employee();
 
-	@Before
-	public void Setup() {
-		employee1.setDepartment("testDep1");
-		employee1.setName("testUser1");
-		employee1.setSalary(1000);
+    /**
+     * employee with same id.
+     */
+    private Employee employeeWithSameId = new Employee();
 
-		employee2.setDepartment("testDep2");
-		employee2.setName("testUser2");
-		employee2.setSalary(2000);
+    /**
+     * employee1 salary.
+     */
+    private final int employee1Salary = 1000;
 
-		employee3.setDepartment("testDep3");
-		employee3.setId(3001L);
-		employee3.setName("testUser3");
-		employee3.setSalary(3000);
-	}
+    /**
+     * employee1 salary for update test.
+     */
+    private final int updateEmployee1Salary1 = 1001;
 
-	//Test the function all together will be better for this task
-	@Test
-	public void testEmployeeService() {
-		
-		/////////////////test with employeeService.saveEmployee 
-		/////////////////test with employeeService.retrieveEmployees 
-		/////////////////test with employeeService.getEmployees
-		
-		// Case 1.1 Test Save one data
-		// Case 1.2 Get employee by Id 1
-		// Case 1.3 Retrieve employee
-		employeeService.saveEmployee(employee1);
+    /**
+     * another employee1 salary for update test.
+     */
+    private final int updateEmployee1Salary2 = 1001;
 
-		Employee employeeGet = employeeService.getEmployee(1L);
-		Assert.assertEquals("testDep1", employeeGet.getDepartment());
-		Assert.assertEquals(Long.valueOf(1), employeeGet.getId());
-		Assert.assertEquals("testUser1", employeeGet.getName());
-		Assert.assertEquals(Integer.valueOf(1000), employeeGet.getSalary());
+    /**
+     * employee2 salary.
+     */
+    private final int employee2Salary = 2000;
 
-		List<Employee> result = employeeService.retrieveEmployees();
-		Assert.assertEquals(1, result.size());
-		Assert.assertEquals("testDep1", result.get(0).getDepartment());
-		Assert.assertEquals(Long.valueOf(1), result.get(0).getId());
-		Assert.assertEquals("testUser1", result.get(0).getName());
-		Assert.assertEquals(Integer.valueOf(1000), result.get(0).getSalary());
+    /**
+     * employee2 id.
+     */
+    private final Long employee2Id = 2001L;
 
-		// Case 2.1 Test Save one more data
-		// Case 2.2 Get employee by Id 1 and id 2
-		// Case 2.3 Retrieve employee
-		employeeService.saveEmployee(employee2);
-		employeeGet = employeeService.getEmployee(1L);
-		Assert.assertEquals("testDep1", employeeGet.getDepartment());
-		Assert.assertEquals(Long.valueOf(1), employeeGet.getId());
-		Assert.assertEquals("testUser1", employeeGet.getName());
-		Assert.assertEquals(Integer.valueOf(1000), employeeGet.getSalary());
-		// Get by Id
-		employeeGet = employeeService.getEmployee(2L);
-		Assert.assertEquals("testDep2", employeeGet.getDepartment());
-		Assert.assertEquals(Long.valueOf(2), employeeGet.getId());
-		Assert.assertEquals("testUser2", employeeGet.getName());
-		Assert.assertEquals(Integer.valueOf(2000), employeeGet.getSalary());
+    /**
+     * employee3 salary.
+     */
+    private final int employee3Salary = 3000;
 
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(2, result.size());
-		Assert.assertEquals("testDep1", result.get(0).getDepartment());
-		Assert.assertEquals(Long.valueOf(1), result.get(0).getId());
-		Assert.assertEquals("testUser1", result.get(0).getName());
-		Assert.assertEquals(Integer.valueOf(1000), result.get(0).getSalary());
-		Assert.assertEquals(2, result.size());
-		Assert.assertEquals("testDep2", result.get(1).getDepartment());
-		Assert.assertEquals(Long.valueOf(2), result.get(1).getId());
-		Assert.assertEquals("testUser2", result.get(1).getName());
-		Assert.assertEquals(Integer.valueOf(2000), result.get(1).getSalary());
+    /**
+     * Initial the the test data.
+     */
+    @Before
+    public void setup() {
+        // Employee without Id
+        employee1.setDepartment("testDep1");
+        employee1.setName("testUser1");
+        employee1.setSalary(employee1Salary);
 
-		// Case 3.1 Test with save data with id has been setup with 3001L
-		// Case 3.2 Get employee by Id 3,
-		// Case 3.3 Retrieve employee with size 3
-		employeeService.saveEmployee(employee3);
+        // Employee with Id
+        employee2.setDepartment("testDep2");
+        employee2.setId(employee2Id);
+        employee2.setName("testUser2");
+        employee2.setSalary(employee2Salary);
 
-		employeeGet = employeeService.getEmployee(3L);
-		Assert.assertEquals("testDep3", employeeGet.getDepartment());
-		Assert.assertEquals(Long.valueOf(3), employeeGet.getId());
-		Assert.assertEquals("testUser3", employeeGet.getName());
-		Assert.assertEquals(Integer.valueOf(3000), employeeGet.getSalary());
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(3, result.size());
+        // Employee With Same Id, the id will be update in test
+        employeeWithSameId.setDepartment("testDep3");
+        employeeWithSameId.setName("testUser3");
+        employeeWithSameId.setSalary(employee3Salary);
+    }
 
-		// Case 4.1 Test saving with employ4 which has empty value
-		// Case 4.2 Get employee by id 4
-		// Case 4.3 Retrieve employee with size 4
-		employeeService.saveEmployee(employee4);
+    /**
+     * Test for set new employee information.
+     */
+    @Test
+    public void testSaveEmployee() {
+        // Normal Cases
+        employeeService.saveEmployee(employee1);
+        Long id = employee1.getId();
+        Employee employeeGet = employeeService.getEmployee(id);
+        Assert.assertEquals("testDep1", employeeGet.getDepartment());
+        Assert.assertEquals("testUser1", employeeGet.getName());
+        Assert.assertEquals(Integer.valueOf(employee1Salary), employeeGet.getSalary());
 
-		employeeGet = employeeService.getEmployee(4L);
-		Assert.assertNull(employeeGet.getDepartment());
-		Assert.assertEquals(Long.valueOf(4), employeeGet.getId());
-		Assert.assertNull(employeeGet.getName());
-		Assert.assertNull(employeeGet.getSalary());
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(4, result.size());
+        // Normal Cases while employee with Id not exist
+        id += 1;
+        employeeService.saveEmployee(employee2);
+        employeeGet = employeeService.getEmployee(id);
+        Assert.assertEquals("testDep2", employeeGet.getDepartment());
+        Assert.assertEquals("testUser2", employeeGet.getName());
+        Assert.assertNotEquals(employee2Id, id);
+        Assert.assertEquals(id, employeeGet.getId());
+        Assert.assertEquals(Integer.valueOf(employee2Salary), employeeGet.getSalary());
 
-		// improved this part with more logic 
-		// Case 5.1 save null
-		// Case 5.2 Retrieve employee with size 4
-		employeeService.saveEmployee(null);
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(4, result.size());
-		
-		// improved this part with more logic to avoid update exist data 
-		// Case 6.1 save with same id (emplyeeId = 1)
-		// Case 6.2 Retrieve employee with size 4
-		// Case 6.3 the data in employeeid=1 will not change 
-		employee4.setId(1L);
-		employeeService.saveEmployee(employee4);
+        // abnormal Cases with same id
+        employeeWithSameId.setId(id);
+        employeeService.saveEmployee(employeeWithSameId);
+        employeeGet = employeeService.getEmployee(id);
+        Assert.assertEquals("testDep2", employeeGet.getDepartment());
+        Assert.assertEquals("testUser2", employeeGet.getName());
+        Assert.assertEquals(id, employeeGet.getId());
+        Assert.assertEquals(Integer.valueOf(employee2Salary), employeeGet.getSalary());
+        id += 1;
+        employeeGet = employeeService.getEmployee(id);
+        Assert.assertNull(employeeGet);
 
-		employeeGet = employeeService.getEmployee(1L);
-		Assert.assertEquals("testDep1", employeeGet.getDepartment());
-		Assert.assertEquals(Long.valueOf(1), employeeGet.getId());
-		Assert.assertEquals("testUser1", employeeGet.getName());
-		Assert.assertEquals(Integer.valueOf(1000), employeeGet.getSalary());
-		
-		// improved with try-catch
-		// Case 7.1 test with get with id not exist 
-		employeeGet = employeeService.getEmployee(100L);
-		Assert.assertNull(employeeGet);
+        // abnormal Cases with null object
+        employeeService.saveEmployee(null);
+        employeeGet = employeeService.getEmployee(id);
+        Assert.assertNull(employeeGet);
+    }
 
-		///////////////Test employeeService.deleteEmployee
-		
-		// Case8.1 test with Delete with id 4
-		// Case8.2 Retrieve employee with size 3
-		// Case8.3 Retrieve employee with id 1,2,3
-		employeeService.deleteEmployee(4L);
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(3, result.size());
-		Assert.assertEquals(Long.valueOf(1), result.get(0).getId());
-		Assert.assertEquals(Long.valueOf(2), result.get(1).getId());
-		Assert.assertEquals(Long.valueOf(3), result.get(2).getId());
+    /**
+     * Test to get all the employees list.
+     */
+    @Test
+    public void testRetrieveEmployees() {
+        // Normal cases with 0 items
+        List<Employee> result = employeeService.retrieveEmployees();
+        Assert.assertEquals(0, result.size());
 
-		// Case 9.1 Test with save data after delete
-		// Case 9.2 Retrieve employee with size 3
-		// Case 9.3 Retrieve employee with id 1,2,3,5
-		employee4.setId(null);
-		employeeService.saveEmployee(employee4);
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(4, result.size());
-		Assert.assertEquals(Long.valueOf(1), result.get(0).getId());
-		Assert.assertEquals(Long.valueOf(2), result.get(1).getId());
-		Assert.assertEquals(Long.valueOf(3), result.get(2).getId());
-		Assert.assertEquals(Long.valueOf(5), result.get(3).getId());
+        // Normal cases with 1 items
+        employeeService.saveEmployee(employee1);
+        Long id1 = employee1.getId();
+        result = employeeService.retrieveEmployees();
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("testDep1", result.get(0).getDepartment());
+        Assert.assertEquals("testUser1", result.get(0).getName());
+        Assert.assertEquals(id1, result.get(0).getId());
+        Assert.assertEquals(Integer.valueOf(employee1Salary), result.get(0).getSalary());
 
-		// Improve with try-catch the cases
-		// Case 10.1 Test Delete id not exist
-		// Case 10.2 Retrieve employee with size 4
-		// Case 10.3 Retrieve employee with id 1,2,3,5
-		employeeService.deleteEmployee(100L);
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(4, result.size());
-		Assert.assertEquals(Long.valueOf(1), result.get(0).getId());
-		Assert.assertEquals(Long.valueOf(2), result.get(1).getId());
-		Assert.assertEquals(Long.valueOf(3), result.get(2).getId());
-		Assert.assertEquals(Long.valueOf(5), result.get(3).getId());
-		
-		///////////////Test employeeService.updateEmployee
-		
-		// Case 11.1 Normal cases update employee with id 5
-		// Case 11.2 Retrieve employee with size 4
-	    // Case 11.3 Retrieve employee with id 1,2,3,5
-		// Case 11.4 Get with updated Value 
-		employee4.setDepartment("testDep5");
-		employee4.setId(5L);
-		employee4.setName("testUser5");
-		employee4.setSalary(5000);
-		employeeService.updateEmployee(employee4, 5L);
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(4, result.size());
-		Assert.assertEquals(Long.valueOf(1), result.get(0).getId());
-		Assert.assertEquals(Long.valueOf(2), result.get(1).getId());
-		Assert.assertEquals(Long.valueOf(3), result.get(2).getId());
-		Assert.assertEquals(Long.valueOf(5), result.get(3).getId());
-		employeeGet = employeeService.getEmployee(5L);
-		Assert.assertEquals("testDep5", employeeGet.getDepartment());
-		Assert.assertEquals(Long.valueOf(5), employeeGet.getId());
-		Assert.assertEquals("testUser5", employeeGet.getName());
-		Assert.assertEquals(Integer.valueOf(5000), employeeGet.getSalary());
-		
-		// Case 12.1 Normal cases update employee with id not exist
-		// Case 12.2 Retrieve employee with size 4
-	    // Case 12.3 Retrieve employee with id 1,2,3,5
-		// Case 12.4 it should be no changes for the data with id=5
-		employee4.setDepartment("testDep6");
-		employee4.setId(6L);
-		employee4.setName("testUser6");
-		employee4.setSalary(6000);
-		employeeService.updateEmployee(employee4, 6L);
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(4, result.size());
-		Assert.assertEquals(Long.valueOf(1), result.get(0).getId());
-		Assert.assertEquals(Long.valueOf(2), result.get(1).getId());
-		Assert.assertEquals(Long.valueOf(3), result.get(2).getId());
-		Assert.assertEquals(Long.valueOf(5), result.get(3).getId());
-		employeeGet = employeeService.getEmployee(5L);
-		Assert.assertEquals("testDep5", employeeGet.getDepartment());
-		Assert.assertEquals(Long.valueOf(5), employeeGet.getId());
-		Assert.assertEquals("testUser5", employeeGet.getName());
-		Assert.assertEquals(Integer.valueOf(5000), employeeGet.getSalary());
-		
-		// Case 13.1 Normal cases update employee with id is not same to object 
-		// Case 13.2 Retrieve employee with size 4
-	    // Case 13.3 Retrieve employee with id 1,2,3,5
-		// Case 13.4 it should be no changes for the data with id=5
-		employee4.setDepartment("testDep6");
-		employee4.setId(6L);
-		employee4.setName("testUser6");
-		employee4.setSalary(6000);
-		employeeService.updateEmployee(employee4, 5L);
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(4, result.size());
-		Assert.assertEquals(Long.valueOf(1), result.get(0).getId());
-		Assert.assertEquals(Long.valueOf(2), result.get(1).getId());
-		Assert.assertEquals(Long.valueOf(3), result.get(2).getId());
-		Assert.assertEquals(Long.valueOf(5), result.get(3).getId());
-		employeeGet = employeeService.getEmployee(5L);
-		Assert.assertEquals("testDep5", employeeGet.getDepartment());
-		Assert.assertEquals(Long.valueOf(5), employeeGet.getId());
-		Assert.assertEquals("testUser5", employeeGet.getName());
-		Assert.assertEquals(Integer.valueOf(5000), employeeGet.getSalary());
-		
-		// improved with more logic
-		// Case 14.1 Normal cases update employee with null
-		// Case 14.2 Retrieve employee with size 6
-		employeeService.updateEmployee(null, 5L);
-		result = employeeService.retrieveEmployees();
-		Assert.assertEquals(4, result.size());
-	}
+        // Normal cases with 2 items
+        employeeService.saveEmployee(employee2);
+        Long id2 = id1 + 1;
+        result = employeeService.retrieveEmployees();
+        Assert.assertEquals(2, result.size());
+        Assert.assertEquals("testDep1", result.get(0).getDepartment());
+        Assert.assertEquals("testUser1", result.get(0).getName());
+        Assert.assertEquals(id1, result.get(0).getId());
+        Assert.assertEquals(Integer.valueOf(employee1Salary), result.get(0).getSalary());
+        Assert.assertEquals("testDep2", result.get(1).getDepartment());
+        Assert.assertEquals("testUser2", result.get(1).getName());
+        Assert.assertEquals(id2, result.get(1).getId());
+        Assert.assertEquals(Integer.valueOf(employee2Salary), result.get(1).getSalary());
+    }
+
+    /**
+     * Test for get employeeId by Id.
+     */
+    @Test
+    public void testGetEmployee() {
+        // Normal cases
+        employeeService.saveEmployee(employee1);
+        Long id = employee1.getId();
+        Employee employeeGet = employeeService.getEmployee(id);
+        Assert.assertEquals("testDep1", employeeGet.getDepartment());
+        Assert.assertEquals("testUser1", employeeGet.getName());
+        Assert.assertEquals(Integer.valueOf(employee1Salary), employeeGet.getSalary());
+
+        // Abnormal cases get not exist id
+        employeeGet = employeeService.getEmployee(id + 1);
+        Assert.assertNull(employeeGet);
+
+        // Abnormal cases get not exist id(id=0)
+        employeeGet = employeeService.getEmployee(0L);
+        Assert.assertNull(employeeGet);
+
+        // Abnormal cases get not exist id(id<0)
+        employeeGet = employeeService.getEmployee(-1L);
+        Assert.assertNull(employeeGet);
+
+        // Abnormal cases with null cases
+        employeeGet = employeeService.getEmployee(null);
+        Assert.assertNull(employeeGet);
+    }
+
+    /**
+     * Test for update the exist employee.
+     */
+    @Test
+    public void testUpdateEmployee() {
+        employeeService.saveEmployee(employee1);
+        Long id = employee1.getId();
+        List<Employee> result = employeeService.retrieveEmployees();
+        Assert.assertEquals(1, result.size());
+        Employee employeeUpdate = new Employee();
+
+        // Normal Cases
+        employeeUpdate.setDepartment("testDep1Update1");
+        employeeUpdate.setName("testUser1Update1");
+        employeeUpdate.setSalary(updateEmployee1Salary1);
+        employeeUpdate.setId(id);
+        employeeService.updateEmployee(employeeUpdate, id);
+        Employee employeeGet = employeeService.getEmployee(id);
+        Assert.assertEquals("testDep1Update1", employeeGet.getDepartment());
+        Assert.assertEquals("testUser1Update1", employeeGet.getName());
+        Assert.assertEquals(Integer.valueOf(updateEmployee1Salary1), employeeGet.getSalary());
+
+        // abnormal Cases without id in employee
+        employeeUpdate.setDepartment("testDep1Update2");
+        employeeUpdate.setName("testUser1Update2");
+        employeeUpdate.setSalary(updateEmployee1Salary2);
+        employeeUpdate.setId(null);
+        employeeService.updateEmployee(employeeUpdate, id);
+        employeeGet = employeeService.getEmployee(id);
+        Assert.assertEquals("testDep1Update1", employeeGet.getDepartment());
+        Assert.assertEquals("testUser1Update1", employeeGet.getName());
+        Assert.assertEquals(Integer.valueOf(updateEmployee1Salary1), employeeGet.getSalary());
+
+        // abnormal Cases without targeting id(id=null)
+        employeeUpdate.setDepartment("testDep1Update2");
+        employeeUpdate.setName("testUser1Update2");
+        employeeUpdate.setSalary(updateEmployee1Salary2);
+        employeeUpdate.setId(id);
+        employeeService.updateEmployee(employeeUpdate, null);
+        employeeGet = employeeService.getEmployee(id);
+        Assert.assertEquals("testDep1Update1", employeeGet.getDepartment());
+        Assert.assertEquals("testUser1Update1", employeeGet.getName());
+        Assert.assertEquals(Integer.valueOf(updateEmployee1Salary1), employeeGet.getSalary());
+
+        // abnormal Cases targeting id is different
+        employeeUpdate.setDepartment("testDep1Update2");
+        employeeUpdate.setName("testUser1Update2");
+        employeeUpdate.setSalary(updateEmployee1Salary2);
+        employeeUpdate.setId(id);
+        employeeService.updateEmployee(employeeUpdate, id + 1);
+        employeeGet = employeeService.getEmployee(id);
+        Assert.assertEquals("testDep1Update1", employeeGet.getDepartment());
+        Assert.assertEquals("testUser1Update1", employeeGet.getName());
+        Assert.assertEquals(Integer.valueOf(updateEmployee1Salary1), employeeGet.getSalary());
+        employeeGet = employeeService.getEmployee(id + 1);
+        Assert.assertNull(employeeGet);
+
+        // abnormal Cases targeting id is not exist
+        employeeUpdate.setDepartment("testDep1Update2");
+        employeeUpdate.setName("testUser1Update2");
+        employeeUpdate.setSalary(updateEmployee1Salary2);
+        employeeUpdate.setId(id + 1);
+        employeeService.updateEmployee(employeeUpdate, id + 1);
+        employeeGet = employeeService.getEmployee(id);
+        Assert.assertEquals("testDep1Update1", employeeGet.getDepartment());
+        Assert.assertEquals("testUser1Update1", employeeGet.getName());
+        Assert.assertEquals(Integer.valueOf(updateEmployee1Salary1), employeeGet.getSalary());
+        employeeGet = employeeService.getEmployee(id + 1);
+        Assert.assertNull(employeeGet);
+    }
+
+    /**
+     * Test for deleting the employee.
+     */
+    @Test
+    public void testDeleteEmployee() {
+        employeeService.saveEmployee(employee1);
+        employeeService.saveEmployee(employee2);
+        Long id = employee1.getId();
+        List<Employee> result = employeeService.retrieveEmployees();
+        Assert.assertEquals(2, result.size());
+
+        // Normal cases
+        employeeService.deleteEmployee(id + 1);
+        result = employeeService.retrieveEmployees();
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("testDep1", result.get(0).getDepartment());
+        Assert.assertEquals("testUser1", result.get(0).getName());
+        Assert.assertEquals(id, result.get(0).getId());
+        Assert.assertEquals(Integer.valueOf(employee1Salary), result.get(0).getSalary());
+        Employee employeeGet = employeeService.getEmployee(id + 1);
+        Assert.assertNull(employeeGet);
+
+        // Abnormal cases get not exist id
+        employeeService.deleteEmployee(id + 1);
+        result = employeeService.retrieveEmployees();
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("testDep1", result.get(0).getDepartment());
+        Assert.assertEquals("testUser1", result.get(0).getName());
+        Assert.assertEquals(id, result.get(0).getId());
+        Assert.assertEquals(Integer.valueOf(employee1Salary), result.get(0).getSalary());
+
+        // Abnormal cases get not exist id(id=0)
+        employeeService.deleteEmployee(0L);
+        result = employeeService.retrieveEmployees();
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("testDep1", result.get(0).getDepartment());
+        Assert.assertEquals("testUser1", result.get(0).getName());
+        Assert.assertEquals(id, result.get(0).getId());
+        Assert.assertEquals(Integer.valueOf(employee1Salary), result.get(0).getSalary());
+
+        // Abnormal cases get not exist id(id<0)
+        employeeService.deleteEmployee(-1L);
+        result = employeeService.retrieveEmployees();
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("testDep1", result.get(0).getDepartment());
+        Assert.assertEquals("testUser1", result.get(0).getName());
+        Assert.assertEquals(id, result.get(0).getId());
+        Assert.assertEquals(Integer.valueOf(employee1Salary), result.get(0).getSalary());
+
+        // Abnormal cases with null object)
+        employeeService.deleteEmployee(null);
+        result = employeeService.retrieveEmployees();
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("testDep1", result.get(0).getDepartment());
+        Assert.assertEquals("testUser1", result.get(0).getName());
+        Assert.assertEquals(id, result.get(0).getId());
+        Assert.assertEquals(Integer.valueOf(employee1Salary), result.get(0).getSalary());
+    }
+
 }
