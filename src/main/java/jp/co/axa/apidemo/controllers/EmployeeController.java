@@ -1,54 +1,72 @@
 package jp.co.axa.apidemo.controllers;
 
+import jp.co.axa.apidemo.dto.EmployeeDto;
 import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * Controller to serve REST API endpoints
+ */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/employees/")
 public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
 
-    public void setEmployeeService(EmployeeService employeeService) {
-        this.employeeService = employeeService;
-    }
+    // except for getAll, none of the other methods shall return id of employee as it is an internal information
+    // getAll needs to return id as well so that it can be used for update and delete operations
 
-    @GetMapping("/employees")
+    /**
+     * Get information of all employees
+     * @return List of employees including their private ids
+     */
+    @GetMapping("getAll")
     public List<Employee> getEmployees() {
-        List<Employee> employees = employeeService.retrieveEmployees();
-        return employees;
+        return employeeService.retrieveEmployees();
     }
 
-    @GetMapping("/employees/{employeeId}")
-    public Employee getEmployee(@PathVariable(name="employeeId")Long employeeId) {
+    /**
+     * Get information of given employee id
+     * @param employeeId employee Id
+     * @return Employee public information
+     */
+    @GetMapping("{employeeId}")
+    public EmployeeDto getEmployee(@PathVariable(name = "employeeId") Long employeeId) {
         return employeeService.getEmployee(employeeId);
     }
 
-    @PostMapping("/employees")
-    public void saveEmployee(Employee employee){
-        employeeService.saveEmployee(employee);
-        System.out.println("Employee Saved Successfully");
+    /**
+     * Create a new employee
+     * @param employeeDto employee public information
+     */
+    @PostMapping("create")
+    public void createEmployee(@Valid EmployeeDto employeeDto) {
+        employeeService.createEmployee(employeeDto);
     }
 
-    @DeleteMapping("/employees/{employeeId}")
-    public void deleteEmployee(@PathVariable(name="employeeId")Long employeeId){
+    /**
+     * Update an existing employee
+     * @param employeeDto employee's new public information
+     * @param employeeId existing employee id
+     */
+    @PutMapping("update/{employeeId}")
+    public void updateEmployee(@RequestBody @Valid EmployeeDto employeeDto,
+                               @PathVariable(name = "employeeId") Long employeeId) {
+        employeeService.updateEmployee(employeeId, employeeDto);
+    }
+
+    /**
+     * Delete an existing employee
+     * @param employeeId existing employee id
+     */
+    @DeleteMapping("delete/{employeeId}")
+    public void deleteEmployee(@PathVariable(name = "employeeId") Long employeeId) {
         employeeService.deleteEmployee(employeeId);
-        System.out.println("Employee Deleted Successfully");
     }
-
-    @PutMapping("/employees/{employeeId}")
-    public void updateEmployee(@RequestBody Employee employee,
-                               @PathVariable(name="employeeId")Long employeeId){
-        Employee emp = employeeService.getEmployee(employeeId);
-        if(emp != null){
-            employeeService.updateEmployee(employee);
-        }
-
-    }
-
 }

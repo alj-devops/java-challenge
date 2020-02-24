@@ -37,3 +37,21 @@ Application (with the embedded H2 database) is ready to be used ! You can access
 - Appropriate usage of packages
 - Is the application running as expected
 - No performance issues
+
+
+#### Implemented
+- Data Transfer Object passed around rather than Domain objects
+- Uniqueness of record enforced by treating (EMPLOYEE_NAME, DEPARTMENT) as unique key pair
+- Step Builders have been added for object instantiation
+- Log statements and formatting
+- REST endpoint made descriptive
+- Request payload validation
+- Exceptions thrown for invalid use cases
+- Documentation of classes and methods
+- Integration test added
+
+#### TODOs
+- Add authentication and authorization to the application
+- Hide salary details except for Admin or HR users
+- Refactor the Response from Controller to better handle exceptions
+- Add Unit tests with Mocking
