@@ -9,30 +9,29 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService{
+public class EmployeeServiceImpl implements EmployeeService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
-    public void setEmployeeRepository(EmployeeRepository employeeRepository) {
+    public EmployeeServiceImpl(@Autowired EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
     public List<Employee> retrieveEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
-        return employees;
+        return employeeRepository.findAll();
     }
 
     public Employee getEmployee(Long employeeId) {
         Optional<Employee> optEmp = employeeRepository.findById(employeeId);
-        return optEmp.get();
+        //returns null if not present
+        return optEmp.isPresent() ? optEmp.get() : null;
     }
 
-    public void saveEmployee(Employee employee){
+    public void saveEmployee(Employee employee) {
         employeeRepository.save(employee);
     }
 
-    public void deleteEmployee(Long employeeId){
+    public void deleteEmployee(Long employeeId) {
         employeeRepository.deleteById(employeeId);
     }
 

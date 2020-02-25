@@ -1,6 +1,8 @@
 package jp.co.axa.apidemo.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -10,6 +12,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name="EMPLOYEE")
 public class Employee {
