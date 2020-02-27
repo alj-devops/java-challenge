@@ -9,33 +9,33 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService{
-
+public class EmployeeServiceImpl implements EmployeeService {
+    
     @Autowired
     private EmployeeRepository employeeRepository;
-
-    public void setEmployeeRepository(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
+    
+    public void deleteEmployee(Long employeeId) {
+        employeeRepository.deleteById(employeeId);
     }
-
-    public List<Employee> retrieveEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
-        return employees;
-    }
-
+    
     public Employee getEmployee(Long employeeId) {
         Optional<Employee> optEmp = employeeRepository.findById(employeeId);
         return optEmp.get();
     }
-
-    public void saveEmployee(Employee employee){
+    
+    public List<Employee> retrieveEmployees() {
+        List<Employee> employees = employeeRepository.findAll();
+        return employees;
+    }
+    
+    public void saveEmployee(Employee employee) {
         employeeRepository.save(employee);
     }
-
-    public void deleteEmployee(Long employeeId){
-        employeeRepository.deleteById(employeeId);
+    
+    public void setEmployeeRepository(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
-
+    
     public void updateEmployee(Employee employee) {
         employeeRepository.save(employee);
     }
