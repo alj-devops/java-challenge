@@ -1,37 +1,47 @@
 package jp.co.axa.apidemo.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+/**
+ * Entity class that maps the EMPLOYEE table
+ *
+ * @author Thea Krista
+ * @version 1.0
+ * @since api-demo-0.0.1
+ */
+@Data
 @Entity
 @Table(name="EMPLOYEE")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Employee {
 
-    @Getter
-    @Setter
+    /**
+     * Employee constructor
+     *
+     * @param name - employee name
+     * @param salary - salary name
+     * @param department - department name
+     */
+    public Employee(String name, Integer salary, String department) {
+        this.name = name;
+        this.salary = salary;
+        this.department = department;
+    }
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="ID", nullable = false, updatable = false)
     private Long id;
 
-    @Getter
-    @Setter
     @Column(name="EMPLOYEE_NAME")
     private String name;
 
-    @Getter
-    @Setter
     @Column(name="EMPLOYEE_SALARY")
     private Integer salary;
 
-    @Getter
-    @Setter
     @Column(name="DEPARTMENT")
     private String department;
 

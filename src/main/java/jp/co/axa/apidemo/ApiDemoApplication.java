@@ -4,12 +4,20 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+/**
+ * Main Spring boot application
+ */
 @EnableSwagger2
 @SpringBootApplication
 public class ApiDemoApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ApiDemoApplication.class, args);
-	}
+    /**
+     * Spring application runner
+     *
+     * @param args - arguments to pass
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(ApiDemoApplication.class, args);
+    }
 
 }
