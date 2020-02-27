@@ -1,4 +1,4 @@
-package jp.co.axa.apidemo.controllers;
+package jp.co.axa.apidemo.controllers.v1;
 
 import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.services.EmployeeService;
@@ -14,32 +14,34 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static jp.co.axa.apidemo.controllers.Paths.*;
+
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(__ + V1 + __ + EMPLOYEES)
 public class EmployeeController {
     
     @Autowired
     private EmployeeService employeeService;
     
-    @DeleteMapping("/employees/{employeeId}")
-    public void deleteEmployee(@PathVariable(name = "employeeId") Long employeeId) {
-        employeeService.deleteEmployee(employeeId);
+    @DeleteMapping(__ + "{" + ID + "}")
+    public void deleteEmployee(@PathVariable(name = ID) final Long id) {
+        employeeService.deleteEmployee(id);
         System.out.println("Employee Deleted Successfully");
     }
     
-    @GetMapping("/employees/{employeeId}")
-    public Employee getEmployee(@PathVariable(name = "employeeId") Long employeeId) {
-        return employeeService.getEmployee(employeeId);
+    @GetMapping(__ + "{" + ID + "}")
+    public Employee getEmployee(@PathVariable(name = ID) final  Long id) {
+        return employeeService.getEmployee(id);
     }
     
-    @GetMapping("/employees")
+    @GetMapping()
     public List<Employee> getEmployees() {
         List<Employee> employees = employeeService.retrieveEmployees();
         return employees;
     }
     
-    @PostMapping("/employees")
-    public void saveEmployee(Employee employee) {
+    @PostMapping()
+    public void saveEmployee(final Employee employee) {
         employeeService.saveEmployee(employee);
         System.out.println("Employee Saved Successfully");
     }
@@ -48,14 +50,13 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
     
-    @PutMapping("/employees/{employeeId}")
-    public void updateEmployee(@RequestBody Employee employee,
-                               @PathVariable(name = "employeeId") Long employeeId) {
-        Employee emp = employeeService.getEmployee(employeeId);
+    @PutMapping(__ + "{" + ID + "}")
+    public void updateEmployee(@RequestBody final  Employee employee,
+                               @PathVariable(name = ID) final Long id) {
+        Employee emp = employeeService.getEmployee(id);
         if (emp != null) {
             employeeService.updateEmployee(employee);
         }
-        
     }
     
 }
