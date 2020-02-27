@@ -2,53 +2,107 @@ package jp.co.axa.apidemo.controllers;
 
 import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.services.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * Controller class that maps API requests for Employee CRUD operations
+ *
+ * @author Thea Krista
+ * @version 1.0
+ * @since api-demo-0.0.1
+ */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/employees")
+@Slf4j
+@RequiredArgsConstructor
 public class EmployeeController {
+    private final EmployeeService employeeService;
 
-    @Autowired
-    private EmployeeService employeeService;
-
-    public void setEmployeeService(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    /**
+     * Get list of all employees
+     *
+     * @return list of employees with HttpStatus 200
+     */
+    @GetMapping
+    public ResponseEntity<List<Employee>> getEmployees() {
+        return ResponseEntity.ok(employeeService.retrieveEmployees());
     }
 
-    @GetMapping("/employees")
-    public List<Employee> getEmployees() {
-        List<Employee> employees = employeeService.retrieveEmployees();
-        return employees;
+    /**
+     * Gets employee information
+     *
+     * @param employeeId - employee ID to retrieve
+     * @return employee information with HttpStatus 200 or HttpStatus 404 if not present
+     */
+    @GetMapping("/{employeeId}")
+    public ResponseEntity<Employee> getEmployee(@PathVariable Long employeeId) {
+        Optional<Employee> employee = employeeService.getEmployee(employeeId);
+        if (!employee.isPresent()) {
+            log.error("Id ".concat(employeeId.toString()).concat(" is not existing"));
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(employee.get());
     }
 
-    @GetMapping("/employees/{employeeId}")
-    public Employee getEmployee(@PathVariable(name="employeeId")Long employeeId) {
-        return employeeService.getEmployee(employeeId);
+    /**
+     * Saves employee information
+     *
+     * @param employee to save/store
+     * @return employee information with HttpStatus 201
+     */
+    @PostMapping
+    public ResponseEntity saveEmployee(@Valid @RequestBody Employee employee) {
+        Employee savedEmployee = employeeService.saveEmployee(employee);
+        if (savedEmployee == null) {
+            log.error("Failed saving employee");
+            return ResponseEntity.badRequest().build();
+        }
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{employeeId}").buildAndExpand(savedEmployee.getId()).toUri();
+        log.info("Employee saved successfully");
+        return ResponseEntity.created(uri).body(savedEmployee);
     }
 
-    @PostMapping("/employees")
-    public void saveEmployee(Employee employee){
-        employeeService.saveEmployee(employee);
-        System.out.println("Employee Saved Successfully");
-    }
-
-    @DeleteMapping("/employees/{employeeId}")
-    public void deleteEmployee(@PathVariable(name="employeeId")Long employeeId){
+    /**
+     * Deletes employee information
+     *
+     * @param employeeId - employee ID to retrieve
+     * @return HttpStatus 202 if deleted or HttpStatus 400 if not
+     */
+    @DeleteMapping("/{employeeId}")
+    public ResponseEntity deleteEmployee(@PathVariable Long employeeId) {
+        if (!employeeService.getEmployee(employeeId).isPresent()) {
+            log.error("Id ".concat(employeeId.toString()).concat(" is not existing"));
+            return ResponseEntity.badRequest().build();
+        }
         employeeService.deleteEmployee(employeeId);
-        System.out.println("Employee Deleted Successfully");
+        String message = "Employee ".concat(employeeId.toString()).concat(" is deleted successfully");
+        log.info(message);
+        return ResponseEntity.accepted().body(message);
     }
 
-    @PutMapping("/employees/{employeeId}")
-    public void updateEmployee(@RequestBody Employee employee,
-                               @PathVariable(name="employeeId")Long employeeId){
-        Employee emp = employeeService.getEmployee(employeeId);
-        if(emp != null){
-            employeeService.updateEmployee(employee);
+    /**
+     * Updates employee information
+     *
+     * @param employee - information to update
+     * @return updated employee data with HTTPStatus of 200
+     */
+    @PutMapping
+    public ResponseEntity updateEmployee(@Valid @RequestBody Employee employee) {
+        if (employee == null || !employeeService.getEmployee(employee.getId()).isPresent()) {
+            log.error("Id " + employee.getId() + " is not existing");
+            return ResponseEntity.badRequest().build();
         }
 
+        log.info("Employee updated successfully");
+        return ResponseEntity.ok(employeeService.saveEmployee(employee));
     }
-
 }
