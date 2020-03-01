@@ -1,13 +1,12 @@
 package jp.co.axa.apidemo.services;
 
 import jp.co.axa.apidemo.entities.Employee;
-import jp.co.axa.apidemo.exceptions.ResourceNotFoundException;
+import jp.co.axa.apidemo.exceptions.EmployeeNotFoundException;
 import jp.co.axa.apidemo.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DefaultEmployeeService implements EmployeeService {
@@ -24,7 +23,7 @@ public class DefaultEmployeeService implements EmployeeService {
     }
     
     public Employee getEmployee(final Long employeeId) {
-        return employeeRepository.findById(employeeId).orElseThrow(ResourceNotFoundException::new);
+        return employeeRepository.findById(employeeId).orElseThrow(EmployeeNotFoundException::new);
     }
     
     public List<Employee> retrieveEmployees() {

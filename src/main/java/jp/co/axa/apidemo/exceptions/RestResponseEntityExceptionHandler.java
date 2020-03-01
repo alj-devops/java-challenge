@@ -17,6 +17,7 @@ public class RestResponseEntityExceptionHandler
         HttpHeaders headers = new HttpHeaders();
         return handleExceptionInternal(ex,
                                        ErrorBody.builder()
+                                                .details(ex.getClass().getName())
                                                 .message(ex.getMessage())
                                                 .build(),
                                        new HttpHeaders(),
