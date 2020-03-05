@@ -2,6 +2,7 @@ package jp.co.axa.apidemo.server.web.v1;
 
 import jp.co.axa.apidemo.client.ClientEmployee;
 import jp.co.axa.apidemo.entities.Employee;
+import jp.co.axa.apidemo.exceptions.EmployeeNotFoundException;
 import jp.co.axa.apidemo.services.EmployeeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ public class EmployeeResources {
     
     @GetMapping(__ + "{" + ID + "}")
     public ClientEmployee getEmployee(@PathVariable(name = ID) final Long id) {
+        log.info("looking for employee which id is {}", id);
         return toClientEmployee(employeeService.getEmployee(id));
     }
     
@@ -48,18 +50,25 @@ public class EmployeeResources {
         return toClientEmployeeList(employeeService.retrieveEmployees());
     }
     
-    @PostMapping()
-    public void saveEmployee(final ClientEmployee input) {
+    @PostMapping(consumes = "application/json")
+    public void saveEmployee(@RequestBody final ClientEmployee input) {
+        if(input.getId()!=null){
+            log.warn("Id should be generated my repositories. Parameter id ignored here.", input);
+            input.setId(null);
+        }
         employeeService.saveEmployee(fromClientEmployee(input));
-        log.info("Employee {} Saved Successfully", input);
+        log.info("Employee {} saved successfully", input);
     }
     
-    @PutMapping(__ + "{" + ID + "}")
-    public void updateEmployee(@RequestBody final Employee employee,
-                               @PathVariable(name = ID) final Long id) {
-        Employee emp = employeeService.getEmployee(id);
-        if (emp != null) {
-            employeeService.updateEmployee(employee);
+    @PutMapping(consumes = "application/json")
+    public void updateEmployee(@RequestBody final Employee input) {
+        try{
+            employeeService.getEmployee(input.getId());
+            employeeService.updateEmployee(input);
+            log.info("Employee {} updated successfully", input);
+        }
+        catch (EmployeeNotFoundException xcpt){
+            log.warn("User not found {}. No update", input);
         }
     }
     

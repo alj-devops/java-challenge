@@ -23,6 +23,7 @@ public class DefaultEmployeeService implements EmployeeService {
     }
     
     public Employee getEmployee(final Long employeeId) {
+        
         return employeeRepository.findById(employeeId)
                                  .orElseThrow(EmployeeNotFoundException::new);
     }
