@@ -1,4 +1,4 @@
-package jp.co.axa.apidemo.controllers;
+package jp.co.axa.apidemo.server.web;
 
 public class Paths {
     

@@ -1,7 +1,9 @@
-package jp.co.axa.apidemo.controllers.v1;
+package jp.co.axa.apidemo.server.web.v1;
 
+import jp.co.axa.apidemo.client.ClientEmployee;
 import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.services.EmployeeService;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,50 +14,48 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.slf4j.Logger;
 
 import java.util.List;
 
-import static jp.co.axa.apidemo.controllers.Paths.*;
+import static jp.co.axa.apidemo.server.web.Paths.*;
+import static jp.co.axa.apidemo.server.web.ResourceMapper.*;
 
 @RestController
 @RequestMapping(__ + V1 + __ + EMPLOYEES)
-public class EmployeeController {
+public class EmployeeResources {
     
-    private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);
+    private static final Logger log = LoggerFactory.getLogger(EmployeeResources.class);
+    private EmployeeService employeeService;
     
     @Autowired
-    private EmployeeService employeeService;
+    public EmployeeResources(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
     
     @DeleteMapping(__ + "{" + ID + "}")
     public void deleteEmployee(@PathVariable(name = ID) final Long id) {
         employeeService.deleteEmployee(id);
-        log.info("Employee Deleted Successfully");
+        log.info("Employee {} Deleted Successfully", id);
     }
     
     @GetMapping(__ + "{" + ID + "}")
-    public Employee getEmployee(@PathVariable(name = ID) final  Long id) {
-        return employeeService.getEmployee(id);
+    public ClientEmployee getEmployee(@PathVariable(name = ID) final Long id) {
+        return toClientEmployee(employeeService.getEmployee(id));
     }
     
     @GetMapping()
-    public List<Employee> getEmployees() {
-        List<Employee> employees = employeeService.retrieveEmployees();
-        return employees;
+    public List<ClientEmployee> getEmployees() {
+        return toClientEmployeeList(employeeService.retrieveEmployees());
     }
     
     @PostMapping()
-    public void saveEmployee(final Employee employee) {
-        employeeService.saveEmployee(employee);
-        log.info("Employee Saved Successfully");
-    }
-    
-    public void setEmployeeService(final EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    public void saveEmployee(final ClientEmployee input) {
+        employeeService.saveEmployee(fromClientEmployee(input));
+        log.info("Employee {} Saved Successfully", input);
     }
     
     @PutMapping(__ + "{" + ID + "}")
-    public void updateEmployee(@RequestBody final  Employee employee,
+    public void updateEmployee(@RequestBody final Employee employee,
                                @PathVariable(name = ID) final Long id) {
         Employee emp = employeeService.getEmployee(id);
         if (emp != null) {
