@@ -1,42 +1,75 @@
 package jp.co.axa.apidemo.services;
 
+import jp.co.axa.apidemo.dto.response.EmployeesResponseDto;
+import jp.co.axa.apidemo.dto.request.EmployeeDto;
+import jp.co.axa.apidemo.dto.request.PatchUpdateEmployeeDto;
 import jp.co.axa.apidemo.entities.Employee;
+import jp.co.axa.apidemo.exceptions.EmployeeNotFoundException;
 import jp.co.axa.apidemo.repositories.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
+@RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService{
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
-    public void setEmployeeRepository(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
+    private EmployeeNotFoundException getNotFoundException(Long employeeId){
+        return new EmployeeNotFoundException(String.format("Employee was not found. id: %d", employeeId));
     }
 
-    public List<Employee> retrieveEmployees() {
-        List<Employee> employees = employeeRepository.findAll();
-        return employees;
+
+    public EmployeesResponseDto retrieveEmployees(int page, int size) {
+        Page<Employee> employeePage = employeeRepository.findAll(PageRequest.of(page, size));
+        Pageable pageable = employeePage.getPageable();
+        return EmployeesResponseDto
+                .builder()
+                .employees(employeePage.getContent())
+                .currentPage(pageable.getPageNumber())
+                .nextPageNumber(pageable.next().getPageNumber())
+                .totalPages(employeePage.getTotalPages())
+                .pageSize(pageable.getPageSize())
+                .build();
     }
 
-    public Employee getEmployee(Long employeeId) {
-        Optional<Employee> optEmp = employeeRepository.findById(employeeId);
-        return optEmp.get();
+
+    public Employee getEmployee(Long employeeId) throws EmployeeNotFoundException {
+        return employeeRepository
+                .findById(employeeId)
+                .orElseThrow(() -> getNotFoundException(employeeId));
     }
 
-    public void saveEmployee(Employee employee){
+    public Employee saveEmployee(EmployeeDto createEmployeeDto){
+        Employee employee = Employee
+                .builder()
+                .department(createEmployeeDto.getDepartment())
+                .name(createEmployeeDto.getName())
+                .salary(createEmployeeDto.getSalary())
+                .build();
+        return employeeRepository.save(employee);
+    }
+
+    public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException{
+        try {
+            employeeRepository.deleteById(employeeId);
+        } catch (EmptyResultDataAccessException e){
+            throw getNotFoundException(employeeId);
+        }
+    }
+
+    public void updateEmployee(Long employeeId, EmployeeDto updateEmployee) throws EmployeeNotFoundException {
+        Employee employee = getEmployee(employeeId);
+        employee.updateAllFields(updateEmployee);
         employeeRepository.save(employee);
     }
-
-    public void deleteEmployee(Long employeeId){
-        employeeRepository.deleteById(employeeId);
-    }
-
-    public void updateEmployee(Employee employee) {
+    public void patchUpdateEmployee(Long employeeId, PatchUpdateEmployeeDto patchUpdateEmployeeDto) throws EmployeeNotFoundException {
+        Employee employee = getEmployee(employeeId);
+        employee.patchUpdateFields(patchUpdateEmployeeDto);
         employeeRepository.save(employee);
     }
 }
