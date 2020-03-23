@@ -1,5 +1,7 @@
 package jp.co.axa.apidemo.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 public class EmployeeController {
+
+    /**
+     * logger.
+     */
+    private static Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @Autowired
     private EmployeeService employeeService;
@@ -32,13 +39,13 @@ public class EmployeeController {
     @PostMapping("/employees")
     public void saveEmployee(Employee employee){
         employeeService.saveEmployee(employee);
-        System.out.println("Employee Saved Successfully");
+        logger.info("Employee Saved Successfully");
     }
 
     @DeleteMapping("/employees/{employeeId}")
     public void deleteEmployee(@PathVariable(name="employeeId")Long employeeId){
         employeeService.deleteEmployee(employeeId);
-        System.out.println("Employee Deleted Successfully");
+        logger.info("Employee Deleted Successfully");
     }
 
     @PutMapping("/employees/{employeeId}")
