@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="LOG_PATH">
+            logs
+        </Property>
+        <Property name="LOG_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${hostName} --- [%15.15t] %-40.40c{1.} : %m%n%ex
+        </Property>
+        <Property name="LOG_FILE_SIZE">
+            100MB
+        </Property>
+        <Property name="LOG_FILE_COUNT">
+            5
+        </Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console -->
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <ThresholdFilter level="INFO"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- Rolling File -->
+        <RollingFile name="RollingFileFatal" fileName="${LOG_PATH}/temp-fatal.log" filePattern="${LOG_PATH}/fatal-%i.log">
+            <LevelRangeFilter minLevel="FATAL" maxLevel="FATAL" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${LOG_FILE_SIZE}" />
+            </Policies>
+            <DefaultRolloverStrategy max="${LOG_FILE_COUNT}"/>
+        </RollingFile>
+        <RollingFile name="RollingFileError" fileName="${LOG_PATH}/temp-error.log" filePattern="${LOG_PATH}/error-%i.log">
+            <LevelRangeFilter minLevel="ERROR" maxLevel="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${LOG_FILE_SIZE}" />
+            </Policies>
+            <DefaultRolloverStrategy max="${LOG_FILE_COUNT}"/>
+        </RollingFile>
+        <RollingFile name="RollingFileWarn" fileName="${LOG_PATH}/temp-warn.log" filePattern="${LOG_PATH}/warn-%i.log">
+            <LevelRangeFilter minLevel="WARN" maxLevel="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${LOG_FILE_SIZE}" />
+            </Policies>
+            <DefaultRolloverStrategy max="${LOG_FILE_COUNT}"/>
+        </RollingFile>
+        <RollingFile name="RollingFileInfo" fileName="${LOG_PATH}/temp-info.log" filePattern="${LOG_PATH}/info-%i.log">
+            <LevelRangeFilter minLevel="INFO" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${LOG_FILE_SIZE}" />
+            </Policies>
+            <DefaultRolloverStrategy max="${LOG_FILE_COUNT}"/>
+        </RollingFile>
+        <RollingFile name="RollingFileDebug" fileName="${LOG_PATH}/temp-debug.log" filePattern="${LOG_PATH}/debug-%i.log">
+            <LevelRangeFilter minLevel="DEBUG" maxLevel="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${LOG_FILE_SIZE}" />
+            </Policies>
+            <DefaultRolloverStrategy max="${LOG_FILE_COUNT}"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="DEBUG">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFileFatal" />
+            <AppenderRef ref="RollingFileError" />
+            <AppenderRef ref="RollingFileWarn" />
+            <AppenderRef ref="RollingFileInfo" />
+            <AppenderRef ref="RollingFileDebug" />
+        </Root>
+    </Loggers>
+</Configuration>
